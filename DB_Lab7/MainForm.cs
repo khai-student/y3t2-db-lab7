@@ -14,14 +14,15 @@ namespace DB_Lab6
     public partial class MainForm : Form
     {
         private PostgresDatabase _db = new PostgresDatabase();
-        private List<string> _ids = new List<string>();
         private bool _is_table_updating = false;
-        private List<List<string>> table = null;
+        private BindingSource _binding_source = null;
         private string _sql = "";
 
         public MainForm()
         {
             InitializeComponent();
+            _binding_source = new BindingSource();
+            guiDGV.DataSource = _binding_source;
             GetTablesList();
         }
 
@@ -70,68 +71,44 @@ namespace DB_Lab6
             guiUpdateTable.Enabled = true;
             guiSearchGroupBox.Enabled = true;
             guiFilterGroupBox.Enabled = true;
+            guiMathGroupBox.Enabled = true;
 
             // if not called manually
             if (!(sender == null && e == null))
             {
                 _sql = string.Format("SELECT * FROM {0};", guiTables.SelectedItem.ToString());
-                table = _db.QueryList(_sql);
+                _binding_source.DataSource = _db.QueryDataTable(_sql);
             }
 
-            guiDGV.Rows.Clear();
-            guiDGV.Columns.Clear();
-
-            if (table.Count == 0)
-            {
-                return;
-            }
+            //if (((DataTable)_binding_source.DataSource).Rows.Count == 0)
+            //{
+            //    return;
+            //}
             // adding columns
             guiSearchColumn.Items.Clear();
             guiFilterColumn.Items.Clear();
+            guiMathColumn.Items.Clear();
             guiSearhPattern.Clear();
 
-            for (int col_index = 0; col_index < table[0].Count; col_index++)
+            foreach (DataColumn column in ((DataTable)_binding_source.DataSource).Columns)
             {   // in first row there always column headers
-                guiDGV.Columns.Add(table[0][col_index], table[0][col_index]);
-
-                if (table[0][col_index].ToLower() == "id")
+                if (column.ColumnName.ToLower() == "id")
                 {
-                    guiDGV.Columns[col_index].Visible = false;
+                    guiDGV.Rows[0].Cells["id"].OwningColumn.Visible = false;
                 }
                 else
                 {
-                    guiSearchColumn.Items.Add(table[0][col_index]);
-                    guiFilterColumn.Items.Add(table[0][col_index]);
+                    guiSearchColumn.Items.Add(column.ColumnName.ToLower());
+                    guiFilterColumn.Items.Add(column.ColumnName.ToLower());
+                    guiMathColumn.Items.Add(column.ColumnName.ToLower());
                 }
             }
             // managing search elements
             guiSearchColumn.SelectedIndex = 0;
             guiFilterColumn.SelectedIndex = 0;
             guiFilterDirection.SelectedIndex = 0;
-
-            // filling table
-            _ids.Clear();
-            for (int row = 1; row < table.Count; row++)
-            {
-                guiDGV.Rows.Add();
-                for (int col = 0; col < table[row].Count; col++)
-                {
-                    if (table[row][col] == "True" || table[row][col] == "False")
-                    {
-                        guiDGV.Rows[row - 1].Cells[col] = new DataGridViewCheckBoxCell(false);
-                        guiDGV.Rows[row - 1].Cells[col].Value = table[row][col] == "True";
-                    }
-                    else
-                    {
-                        guiDGV.Rows[row - 1].Cells[col].Value = table[row][col];
-                    }
-
-                    if (table[0][col] == "id")
-                    {
-                        _ids.Add(table[row][col]);
-                    }
-                }
-            }
+            guiMathAlgo.SelectedIndex = 0;
+            guiMathColumn.SelectedIndex = 0;
 
             _is_table_updating = false;
         }
@@ -144,154 +121,19 @@ namespace DB_Lab6
             }
             _is_table_updating = true;
 
-            for (int row = 0; row < guiDGV.Rows.Count-1; row++)
-            {
-                // if record is new
-                if (guiDGV.Rows[row].Cells["id"].Value == null)
-                {
-                    InsertRow(row);
-                    continue;
-                }
-
-                _sql = string.Format("UPDATE {0} SET ", guiTables.SelectedItem.ToString());
-
-                for (int col = 0; col < guiDGV.Rows[row].Cells.Count; col++)
-                {
-                    // dont touch id
-                    if (guiDGV.Columns[col].HeaderText == "id" || guiDGV.Rows[row].Cells[col].Value == null)
-                    {
-                        continue;
-                    }
-
-                    if (guiDGV.Rows[row].Cells[col] is DataGridViewCheckBoxCell)
-                    {
-                        _sql += string.Format("{0} = {1}",
-                                guiDGV.Rows[row].Cells[col].OwningColumn.HeaderText,
-                                (bool)guiDGV.Rows[row].Cells[col].Value ? "TRUE" : "FALSE");
-                    }
-                    else
-                    {
-                        double number = 0;
-                        if (double.TryParse(guiDGV.Rows[row].Cells[col].Value.ToString(), out number))
-                        {
-                            _sql += string.Format("{0} = {1}",
-                                guiDGV.Rows[row].Cells[col].OwningColumn.HeaderText,
-                                guiDGV.Rows[row].Cells[col].Value.ToString());
-                        }
-                        else
-                        {
-                            _sql += string.Format("{0} = '{1}'",
-                                guiDGV.Rows[row].Cells[col].OwningColumn.HeaderText,
-                                guiDGV.Rows[row].Cells[col].Value.ToString());
-                        }
-                    }
-                    // adding space and ,
-                    _sql += ", ";
-                }
-
-                _sql += string.Format("WHERE id = {0};", guiDGV.Rows[row].Cells["id"].Value.ToString());
-                _sql = _sql.Replace(", WHERE", " WHERE");
-
-                // trying to update
-                try
-                {
-                    _db.Exec(_sql);
-                }
-                catch (Exception ex)
-                {
-                    guiDGV.ClearSelection();
-                    guiDGV.Rows[row].Selected = true;
-                    Logger.Error("Cannot update selected cortege.\n" + ex.Message);
-                    break;
-                }
-            }
-
-            _is_table_updating = false;
-        }
-
-        private void InsertRow(int row)
-        {
-            if (row < 0)
-            {
-                throw new IndexOutOfRangeException();
-            }
-
-            _sql = string.Format("INSERT INTO {0} (", guiTables.SelectedItem.ToString());
-
-            for (int col = 0; col < guiDGV.Rows[row].Cells.Count; col++)
-            {
-                // dont touch id
-                if (guiDGV.Columns[col].HeaderText != "id")
-                {
-                    _sql += string.Format("{0}, ", guiDGV.Columns[col].HeaderText);
-                }
-            }
-
-            _sql += ") VALUES (";
-            _sql = _sql.Replace(", )", ")");
-
-            for (int col = 0; col < guiDGV.Rows[row].Cells.Count; col++)
-            {
-                // dont touch id
-                if (guiDGV.Columns[col].HeaderText != "id")
-                {
-                    if (guiDGV.Rows[row].Cells[col] is DataGridViewCheckBoxCell)
-                    {
-                        _sql += (bool)guiDGV.Rows[row].Cells[col].Value ? "TRUE" : "FALSE";
-                    }
-                    else
-                    {
-                        double number = 0;
-                        if (double.TryParse(guiDGV.Rows[row].Cells[col].Value.ToString(), out number))
-                        {
-                            _sql += guiDGV.Rows[row].Cells[col].Value.ToString();
-                        }
-                        else
-                        {
-                            _sql += string.Format("'{0}'", guiDGV.Rows[row].Cells[col].Value.ToString());
-                        }
-                    }
-                    // adding space and ,
-                    _sql += ", ";
-                }
-            }
-
-            _sql += ");";
-            _sql = _sql.Replace(", )", ")");
-
-            // trying to insert
             try
             {
-                _db.Exec(_sql);
+                _db.UpdateData((DataTable)_binding_source.DataSource);
             }
             catch (Exception ex)
             {
-                guiDGV.ClearSelection();
-                guiDGV.Rows[row].Selected = true;
-                Logger.Error("Cannot insert selected cortege.\n" + ex.Message);
+                Logger.Error("Cannot update data in table.");
             }
-        }
-
-        private void guiDGV_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
-        {
-            if (_is_table_updating)
+            finally
             {
-                return;
+                _is_table_updating = false;
             }
-            _is_table_updating = true;
-
-            try
-            {
-                _db.Exec(string.Format("DELETE FROM {0} WHERE id = {1};",
-                guiTables.SelectedItem.ToString(),
-                _ids[e.RowIndex]));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Failed to remove the row.\n" + ex.Message);
-            };
-
-            _is_table_updating = false;
+            
         }
 
         private void guiSearch_Click(object sender, EventArgs e)
@@ -338,7 +180,7 @@ namespace DB_Lab6
             // trying to select
             try
             {
-                table = _db.QueryList(_sql);
+                _binding_source.DataSource = _db.QueryDataTable(_sql);
 
                 _is_table_updating = false;
                 guiQueryTable_Click(null, null);
@@ -375,7 +217,7 @@ namespace DB_Lab6
             // trying to select
             try
             {
-                table = _db.QueryList(order_sql);
+                _binding_source.DataSource = _db.QueryDataTable(order_sql);
 
                 _is_table_updating = false;
                 guiQueryTable_Click(null, null);
@@ -384,6 +226,48 @@ namespace DB_Lab6
             catch
             {
                 Logger.Info("No items found.");
+            }
+            finally
+            {
+                _is_table_updating = false;
+            }
+        }
+
+        private void guiMath_Click(object sender, EventArgs e)
+        {
+            string function = "";
+
+            switch (guiMathAlgo.SelectedItem.ToString().ToLower())
+            {
+                case "min":
+                    function = "MIN";
+                    break;
+                case "max":
+                    function = "MAX";
+                    break;
+                case "average":
+                    function = "AVG";
+                    break;
+                case "sum":
+                    function = "min";
+                    break;
+                default:
+                    break;
+            }
+
+            _sql = string.Format("SELECT {0} ({1}) FROM {2};",
+                function,
+                guiMathColumn.SelectedItem.ToString(),
+                guiTables.SelectedItem.ToString());
+
+            // trying to select
+            try
+            {
+                _binding_source.DataSource = _db.QueryDataTable(_sql);
+            }
+            catch
+            {
+                Logger.Info("Cannot evaluate algorithm found.");
             }
             finally
             {
