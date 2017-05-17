@@ -70,8 +70,9 @@ namespace DB_Lab6
 
             guiUpdateTable.Enabled = true;
             guiSearchGroupBox.Enabled = true;
-            guiFilterGroupBox.Enabled = true;
+            guiSortGroupBox.Enabled = true;
             guiMathGroupBox.Enabled = true;
+            guiFilterGroupBox.Enabled = true;
 
             // if not called manually
             if (!(sender == null && e == null))
@@ -86,8 +87,9 @@ namespace DB_Lab6
             //}
             // adding columns
             guiSearchColumn.Items.Clear();
-            guiFilterColumn.Items.Clear();
+            guiSortColumn.Items.Clear();
             guiMathColumn.Items.Clear();
+            guiFilterColumn.Items.Clear();
             guiSearhPattern.Clear();
 
             foreach (DataColumn column in ((DataTable)_binding_source.DataSource).Columns)
@@ -99,16 +101,19 @@ namespace DB_Lab6
                 else
                 {
                     guiSearchColumn.Items.Add(column.ColumnName.ToLower());
-                    guiFilterColumn.Items.Add(column.ColumnName.ToLower());
+                    guiSortColumn.Items.Add(column.ColumnName.ToLower());
                     guiMathColumn.Items.Add(column.ColumnName.ToLower());
+                    guiFilterColumn.Items.Add(column.ColumnName.ToLower());
                 }
             }
             // managing search elements
             guiSearchColumn.SelectedIndex = 0;
-            guiFilterColumn.SelectedIndex = 0;
-            guiFilterDirection.SelectedIndex = 0;
+            guiSortColumn.SelectedIndex = 0;
+            guiSortDirection.SelectedIndex = 0;
             guiMathAlgo.SelectedIndex = 0;
             guiMathColumn.SelectedIndex = 0;
+            guiFilterColumn.SelectedIndex = 0;
+            guiFilterPred.SelectedIndex = 2;
 
             _is_table_updating = false;
         }
@@ -196,7 +201,7 @@ namespace DB_Lab6
             }
         }
 
-        private void guiFilter_Click(object sender, EventArgs e)
+        private void guiSort_Click(object sender, EventArgs e)
         {
             if (_is_table_updating)
             {
@@ -210,8 +215,8 @@ namespace DB_Lab6
                 order_sql = string.Format("SELECT * FROM {0};", guiTables.SelectedItem.ToString());
             }
             // 
-            string direction = guiFilterDirection.SelectedItem.ToString() == "ascending" ? "ASC" : "DESC";
-            order_sql += string.Format(" ORDER BY {0} {1};", guiFilterColumn.SelectedItem.ToString(), direction);
+            string direction = guiSortDirection.SelectedItem.ToString() == "ascending" ? "ASC" : "DESC";
+            order_sql += string.Format(" ORDER BY {0} {1};", guiSortColumn.SelectedItem.ToString(), direction);
             order_sql = order_sql.Replace("; ORDER", " ORDER");
 
             // trying to select
@@ -268,6 +273,29 @@ namespace DB_Lab6
             catch
             {
                 Logger.Info("Cannot evaluate algorithm found.");
+            }
+            finally
+            {
+                _is_table_updating = false;
+            }
+        }
+
+        private void guiFilter_Click(object sender, EventArgs e)
+        {
+            _sql = string.Format("SELECT * FROM {0} WHERE {1} {2} {3};",
+                guiTables.SelectedItem.ToString(),
+                guiFilterColumn.SelectedItem.ToString(),
+                guiFilterPred.SelectedItem.ToString(),
+                guiFilterValue.Value.ToString());
+
+            // trying to select
+            try
+            {
+                _binding_source.DataSource = _db.QueryDataTable(_sql);
+            }
+            catch
+            {
+                Logger.Info("Cannot filter.");
             }
             finally
             {

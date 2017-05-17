@@ -32,14 +32,19 @@
             System.Windows.Forms.SplitContainer splitContainer1;
             System.Windows.Forms.GroupBox groupBox1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            this.guiFilterGroupBox = new System.Windows.Forms.GroupBox();
+            this.guiFilterValue = new System.Windows.Forms.NumericUpDown();
+            this.guiFilterPred = new System.Windows.Forms.ComboBox();
+            this.guiFilterColumn = new System.Windows.Forms.ComboBox();
+            this.guiFilter = new System.Windows.Forms.Button();
             this.guiMathGroupBox = new System.Windows.Forms.GroupBox();
             this.guiMathAlgo = new System.Windows.Forms.ComboBox();
             this.guiMathColumn = new System.Windows.Forms.ComboBox();
             this.guiMath = new System.Windows.Forms.Button();
-            this.guiFilterGroupBox = new System.Windows.Forms.GroupBox();
-            this.guiFilterDirection = new System.Windows.Forms.ComboBox();
-            this.guiFilterColumn = new System.Windows.Forms.ComboBox();
-            this.guiFilter = new System.Windows.Forms.Button();
+            this.guiSortGroupBox = new System.Windows.Forms.GroupBox();
+            this.guiSortDirection = new System.Windows.Forms.ComboBox();
+            this.guiSortColumn = new System.Windows.Forms.ComboBox();
+            this.guiSort = new System.Windows.Forms.Button();
             this.guiSearchGroupBox = new System.Windows.Forms.GroupBox();
             this.guiSearchColumn = new System.Windows.Forms.ComboBox();
             this.guiSearhPattern = new System.Windows.Forms.TextBox();
@@ -55,8 +60,10 @@
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
-            this.guiMathGroupBox.SuspendLayout();
             this.guiFilterGroupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.guiFilterValue)).BeginInit();
+            this.guiMathGroupBox.SuspendLayout();
+            this.guiSortGroupBox.SuspendLayout();
             this.guiSearchGroupBox.SuspendLayout();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.guiDGV)).BeginInit();
@@ -79,18 +86,84 @@
             // 
             // splitContainer1.Panel1
             // 
-            splitContainer1.Panel1.Controls.Add(this.guiMathGroupBox);
             splitContainer1.Panel1.Controls.Add(this.guiFilterGroupBox);
+            splitContainer1.Panel1.Controls.Add(this.guiMathGroupBox);
+            splitContainer1.Panel1.Controls.Add(this.guiSortGroupBox);
             splitContainer1.Panel1.Controls.Add(this.guiSearchGroupBox);
             splitContainer1.Panel1.Controls.Add(groupBox1);
             // 
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(this.guiDGV);
-            splitContainer1.Size = new System.Drawing.Size(783, 406);
-            splitContainer1.SplitterDistance = 180;
+            splitContainer1.Size = new System.Drawing.Size(708, 535);
+            splitContainer1.SplitterDistance = 177;
             splitContainer1.SplitterWidth = 3;
             splitContainer1.TabIndex = 100;
+            // 
+            // guiFilterGroupBox
+            // 
+            this.guiFilterGroupBox.Controls.Add(this.guiFilterValue);
+            this.guiFilterGroupBox.Controls.Add(this.guiFilterPred);
+            this.guiFilterGroupBox.Controls.Add(this.guiFilterColumn);
+            this.guiFilterGroupBox.Controls.Add(this.guiFilter);
+            this.guiFilterGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.guiFilterGroupBox.Enabled = false;
+            this.guiFilterGroupBox.Location = new System.Drawing.Point(0, 406);
+            this.guiFilterGroupBox.Name = "guiFilterGroupBox";
+            this.guiFilterGroupBox.Size = new System.Drawing.Size(177, 128);
+            this.guiFilterGroupBox.TabIndex = 8;
+            this.guiFilterGroupBox.TabStop = false;
+            this.guiFilterGroupBox.Text = "Filter";
+            // 
+            // guiFilterValue
+            // 
+            this.guiFilterValue.Location = new System.Drawing.Point(9, 73);
+            this.guiFilterValue.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.guiFilterValue.Minimum = new decimal(new int[] {
+            65536,
+            0,
+            0,
+            -2147483648});
+            this.guiFilterValue.Name = "guiFilterValue";
+            this.guiFilterValue.Size = new System.Drawing.Size(163, 20);
+            this.guiFilterValue.TabIndex = 6;
+            this.guiFilterValue.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // guiFilterPred
+            // 
+            this.guiFilterPred.FormattingEnabled = true;
+            this.guiFilterPred.Items.AddRange(new object[] {
+            "<",
+            "<=",
+            "=",
+            ">=",
+            ">"});
+            this.guiFilterPred.Location = new System.Drawing.Point(42, 46);
+            this.guiFilterPred.Name = "guiFilterPred";
+            this.guiFilterPred.Size = new System.Drawing.Size(94, 21);
+            this.guiFilterPred.TabIndex = 5;
+            // 
+            // guiFilterColumn
+            // 
+            this.guiFilterColumn.FormattingEnabled = true;
+            this.guiFilterColumn.Location = new System.Drawing.Point(6, 19);
+            this.guiFilterColumn.Name = "guiFilterColumn";
+            this.guiFilterColumn.Size = new System.Drawing.Size(166, 21);
+            this.guiFilterColumn.TabIndex = 0;
+            // 
+            // guiFilter
+            // 
+            this.guiFilter.Location = new System.Drawing.Point(6, 100);
+            this.guiFilter.Name = "guiFilter";
+            this.guiFilter.Size = new System.Drawing.Size(166, 23);
+            this.guiFilter.TabIndex = 4;
+            this.guiFilter.Text = "Filter";
+            this.guiFilter.UseVisualStyleBackColor = true;
+            this.guiFilter.Click += new System.EventHandler(this.guiFilter_Click);
             // 
             // guiMathGroupBox
             // 
@@ -101,7 +174,7 @@
             this.guiMathGroupBox.Enabled = false;
             this.guiMathGroupBox.Location = new System.Drawing.Point(0, 303);
             this.guiMathGroupBox.Name = "guiMathGroupBox";
-            this.guiMathGroupBox.Size = new System.Drawing.Size(180, 103);
+            this.guiMathGroupBox.Size = new System.Drawing.Size(177, 103);
             this.guiMathGroupBox.TabIndex = 7;
             this.guiMathGroupBox.TabStop = false;
             this.guiMathGroupBox.Text = "Math";
@@ -137,48 +210,48 @@
             this.guiMath.UseVisualStyleBackColor = true;
             this.guiMath.Click += new System.EventHandler(this.guiMath_Click);
             // 
-            // guiFilterGroupBox
+            // guiSortGroupBox
             // 
-            this.guiFilterGroupBox.Controls.Add(this.guiFilterDirection);
-            this.guiFilterGroupBox.Controls.Add(this.guiFilterColumn);
-            this.guiFilterGroupBox.Controls.Add(this.guiFilter);
-            this.guiFilterGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
-            this.guiFilterGroupBox.Enabled = false;
-            this.guiFilterGroupBox.Location = new System.Drawing.Point(0, 193);
-            this.guiFilterGroupBox.Name = "guiFilterGroupBox";
-            this.guiFilterGroupBox.Size = new System.Drawing.Size(180, 110);
-            this.guiFilterGroupBox.TabIndex = 6;
-            this.guiFilterGroupBox.TabStop = false;
-            this.guiFilterGroupBox.Text = "Filter";
+            this.guiSortGroupBox.Controls.Add(this.guiSortDirection);
+            this.guiSortGroupBox.Controls.Add(this.guiSortColumn);
+            this.guiSortGroupBox.Controls.Add(this.guiSort);
+            this.guiSortGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
+            this.guiSortGroupBox.Enabled = false;
+            this.guiSortGroupBox.Location = new System.Drawing.Point(0, 193);
+            this.guiSortGroupBox.Name = "guiSortGroupBox";
+            this.guiSortGroupBox.Size = new System.Drawing.Size(177, 110);
+            this.guiSortGroupBox.TabIndex = 6;
+            this.guiSortGroupBox.TabStop = false;
+            this.guiSortGroupBox.Text = "Sort";
             // 
-            // guiFilterDirection
+            // guiSortDirection
             // 
-            this.guiFilterDirection.FormattingEnabled = true;
-            this.guiFilterDirection.Items.AddRange(new object[] {
+            this.guiSortDirection.FormattingEnabled = true;
+            this.guiSortDirection.Items.AddRange(new object[] {
             "ascending",
             "descending"});
-            this.guiFilterDirection.Location = new System.Drawing.Point(6, 45);
-            this.guiFilterDirection.Name = "guiFilterDirection";
-            this.guiFilterDirection.Size = new System.Drawing.Size(166, 21);
-            this.guiFilterDirection.TabIndex = 5;
+            this.guiSortDirection.Location = new System.Drawing.Point(6, 45);
+            this.guiSortDirection.Name = "guiSortDirection";
+            this.guiSortDirection.Size = new System.Drawing.Size(166, 21);
+            this.guiSortDirection.TabIndex = 5;
             // 
-            // guiFilterColumn
+            // guiSortColumn
             // 
-            this.guiFilterColumn.FormattingEnabled = true;
-            this.guiFilterColumn.Location = new System.Drawing.Point(6, 19);
-            this.guiFilterColumn.Name = "guiFilterColumn";
-            this.guiFilterColumn.Size = new System.Drawing.Size(166, 21);
-            this.guiFilterColumn.TabIndex = 0;
+            this.guiSortColumn.FormattingEnabled = true;
+            this.guiSortColumn.Location = new System.Drawing.Point(6, 19);
+            this.guiSortColumn.Name = "guiSortColumn";
+            this.guiSortColumn.Size = new System.Drawing.Size(166, 21);
+            this.guiSortColumn.TabIndex = 0;
             // 
-            // guiFilter
+            // guiSort
             // 
-            this.guiFilter.Location = new System.Drawing.Point(6, 72);
-            this.guiFilter.Name = "guiFilter";
-            this.guiFilter.Size = new System.Drawing.Size(166, 23);
-            this.guiFilter.TabIndex = 4;
-            this.guiFilter.Text = "Filter";
-            this.guiFilter.UseVisualStyleBackColor = true;
-            this.guiFilter.Click += new System.EventHandler(this.guiFilter_Click);
+            this.guiSort.Location = new System.Drawing.Point(6, 72);
+            this.guiSort.Name = "guiSort";
+            this.guiSort.Size = new System.Drawing.Size(166, 23);
+            this.guiSort.TabIndex = 4;
+            this.guiSort.Text = "Sort";
+            this.guiSort.UseVisualStyleBackColor = true;
+            this.guiSort.Click += new System.EventHandler(this.guiSort_Click);
             // 
             // guiSearchGroupBox
             // 
@@ -189,7 +262,7 @@
             this.guiSearchGroupBox.Enabled = false;
             this.guiSearchGroupBox.Location = new System.Drawing.Point(0, 83);
             this.guiSearchGroupBox.Name = "guiSearchGroupBox";
-            this.guiSearchGroupBox.Size = new System.Drawing.Size(180, 110);
+            this.guiSearchGroupBox.Size = new System.Drawing.Size(177, 110);
             this.guiSearchGroupBox.TabIndex = 5;
             this.guiSearchGroupBox.TabStop = false;
             this.guiSearchGroupBox.Text = "Search";
@@ -228,7 +301,7 @@
             groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
             groupBox1.Location = new System.Drawing.Point(0, 0);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new System.Drawing.Size(180, 83);
+            groupBox1.Size = new System.Drawing.Size(177, 83);
             groupBox1.TabIndex = 5;
             groupBox1.TabStop = false;
             groupBox1.Text = "Table";
@@ -271,14 +344,14 @@
             this.guiDGV.MultiSelect = false;
             this.guiDGV.Name = "guiDGV";
             this.guiDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.guiDGV.Size = new System.Drawing.Size(600, 406);
+            this.guiDGV.Size = new System.Drawing.Size(528, 535);
             this.guiDGV.TabIndex = 10;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(783, 406);
+            this.ClientSize = new System.Drawing.Size(708, 535);
             this.Controls.Add(splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
@@ -287,8 +360,10 @@
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(splitContainer1)).EndInit();
             splitContainer1.ResumeLayout(false);
-            this.guiMathGroupBox.ResumeLayout(false);
             this.guiFilterGroupBox.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.guiFilterValue)).EndInit();
+            this.guiMathGroupBox.ResumeLayout(false);
+            this.guiSortGroupBox.ResumeLayout(false);
             this.guiSearchGroupBox.ResumeLayout(false);
             this.guiSearchGroupBox.PerformLayout();
             groupBox1.ResumeLayout(false);
@@ -308,14 +383,19 @@
         private System.Windows.Forms.ComboBox guiSearchColumn;
         private System.Windows.Forms.Button guiUpdateTable;
         private System.Windows.Forms.GroupBox guiSearchGroupBox;
-        private System.Windows.Forms.GroupBox guiFilterGroupBox;
-        private System.Windows.Forms.ComboBox guiFilterColumn;
-        private System.Windows.Forms.Button guiFilter;
-        private System.Windows.Forms.ComboBox guiFilterDirection;
+        private System.Windows.Forms.GroupBox guiSortGroupBox;
+        private System.Windows.Forms.ComboBox guiSortColumn;
+        private System.Windows.Forms.Button guiSort;
+        private System.Windows.Forms.ComboBox guiSortDirection;
         private System.Windows.Forms.GroupBox guiMathGroupBox;
         private System.Windows.Forms.ComboBox guiMathAlgo;
         private System.Windows.Forms.ComboBox guiMathColumn;
         private System.Windows.Forms.Button guiMath;
+        private System.Windows.Forms.GroupBox guiFilterGroupBox;
+        private System.Windows.Forms.NumericUpDown guiFilterValue;
+        private System.Windows.Forms.ComboBox guiFilterPred;
+        private System.Windows.Forms.ComboBox guiFilterColumn;
+        private System.Windows.Forms.Button guiFilter;
     }
 }
 
